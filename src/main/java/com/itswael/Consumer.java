@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 public class Consumer {
     public void start(){
@@ -15,6 +16,7 @@ public class Consumer {
     private void crawl(){
         Document doc = null;
         String url = this.getCrawlUrl();
+        HashSet<String> anchors = new HashSet<String>();
         try {
             doc = Jsoup.connect(url).get();
         } catch (IOException e) {
@@ -23,6 +25,7 @@ public class Consumer {
         log(doc.title());
         Elements newsHeadlines = doc.select("#mp-itn b a");
         for (Element headline : newsHeadlines) {
+            anchors.add(headline.absUrl("href"));
             log("%s\n\t%s",
                     headline.attr("title"), headline.absUrl("href"));
         }
