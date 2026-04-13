@@ -17,7 +17,7 @@ public class Consumer {
     private void crawl(){
         String url = "https://www.jsoup.org";
         String wikiUrl = "https://en.wikipedia.org/";
-        Domain domain = new Domain("",wikiUrl);
+        Domain domain = new Domain(Hasher.toSha256(wikiUrl),wikiUrl);
         DomainUrl domainUrl = new DomainUrl(domain.getDomainHash(), domain.getDomainUrl(), domain);
         Document doc;
         HashSet<String> hrefs = new HashSet<>();
