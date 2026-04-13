@@ -14,28 +14,26 @@ public class Consumer {
     }
 
     private void crawl(){
-        Document doc = null;
-        String url = this.getCrawlUrl();
-        HashSet<String> anchors = new HashSet<String>();
+        String url = "https://www.jsoup.org";
+        String wikiUrl = "https://en.wikipedia.org/";
+        Domain domain = new Domain("",url);
+        DomainUrl domainUrl = new DomainUrl(domain.getDomainHash(), domain.getDomainUrl(), domain);
+        Document doc;
+        HashSet<String> hrefs = new HashSet<>();
         try {
-            doc = Jsoup.connect(url).get();
+            doc = Jsoup.connect(domainUrl.getGetDomainUrl()).get();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        log(doc.title());
+
         Elements newsHeadlines = doc.select("#mp-itn b a");
-        for (Element headline : newsHeadlines) {
-            anchors.add(headline.absUrl("href"));
-            log("%s\n\t%s",
-                    headline.attr("title"), headline.absUrl("href"));
-        }
-    }
+        newsHeadlines.forEach(x ->{
+            String href = x.absUrl("href");
+            href = HtmlTools.fixUrl(href, domain);
+            hrefs.add(href);
+//            log("%s\n\t%s", x.attr("title"), href);
+        });
 
-    private static void log(String msg, String... vals) {
-        System.out.printf((msg) + "%n", (Object[]) vals);
-    }
-
-    private String getCrawlUrl() {
-        return "https://en.wikipedia.org/";
+        hrefs.forEach(System.out::println);
     }
 }
