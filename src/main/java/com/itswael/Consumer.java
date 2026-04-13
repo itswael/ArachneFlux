@@ -10,36 +10,30 @@ import java.util.HashSet;
 
 public class Consumer {
     public void start(){
-
         crawl();
     }
 
     private void crawl(){
-        Domain domain = new Domain("","https://en.wikipedia.org/");
-        Document doc = null;
-        String url = this.getCrawlUrl();
-        HashSet<String> hrefs = new HashSet<String>();
+        String url = "https://www.jsoup.org";
+        String wikiUrl = "https://en.wikipedia.org/";
+        Domain domain = new Domain("",url);
+        DomainUrl domainUrl = new DomainUrl(domain.getDomainHash(), domain.getDomainUrl(), domain);
+        Document doc;
+        HashSet<String> hrefs = new HashSet<>();
         try {
-            doc = Jsoup.connect(url).get();
+            doc = Jsoup.connect(domainUrl.getGetDomainUrl()).get();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        log(doc.title());
-        Elements newsHeadlines = doc.select("#mp-itn b a");
 
+        Elements newsHeadlines = doc.select("#mp-itn b a");
         newsHeadlines.forEach(x ->{
             String href = x.absUrl("href");
             href = HtmlTools.fixUrl(href, domain);
             hrefs.add(href);
-            log("%s\n\t%s", x.attr("title"), href);
+//            log("%s\n\t%s", x.attr("title"), href);
         });
-    }
 
-    private static void log(String msg, String... vals) {
-        System.out.printf((msg) + "%n", (Object[]) vals);
-    }
-
-    private String getCrawlUrl() {
-        return "https://en.wikipedia.org/";
+        hrefs.forEach(System.out::println);
     }
 }
