@@ -10,13 +10,15 @@ import java.util.HashSet;
 
 public class Consumer {
     public void start(){
+
         crawl();
     }
 
     private void crawl(){
+        Domain domain = new Domain("","https://en.wikipedia.org/");
         Document doc = null;
         String url = this.getCrawlUrl();
-        HashSet<String> anchors = new HashSet<String>();
+        HashSet<String> hrefs = new HashSet<String>();
         try {
             doc = Jsoup.connect(url).get();
         } catch (IOException e) {
@@ -24,11 +26,13 @@ public class Consumer {
         }
         log(doc.title());
         Elements newsHeadlines = doc.select("#mp-itn b a");
-        for (Element headline : newsHeadlines) {
-            anchors.add(headline.absUrl("href"));
-            log("%s\n\t%s",
-                    headline.attr("title"), headline.absUrl("href"));
-        }
+
+        newsHeadlines.forEach(x ->{
+            String href = x.absUrl("href");
+            href = HtmlTools.fixUrl(href, domain);
+            hrefs.add(href);
+            log("%s\n\t%s", x.attr("title"), href);
+        });
     }
 
     private static void log(String msg, String... vals) {
